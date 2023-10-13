@@ -1276,7 +1276,7 @@ extern traceObjectClass TraceQueueClassTable[5];
 
 #define traceTASK_INCREMENT_TICK( xTickCount ) \
 	if (uxSchedulerSuspended == ( unsigned portBASE_TYPE ) pdTRUE || xPendedTicks == 0) { trcKERNEL_HOOKS_INCREMENT_TICK(); } \
-	if (uxSchedulerSuspended == ( unsigned portBASE_TYPE ) pdFALSE) { trcKERNEL_HOOKS_NEW_TIME(DIV_NEW_TIME, xTickCount + 1); }
+	if (uxSchedulerSuspended == ( unsigned portBASE_TYPE ) pdFALSE) { trcKERNEL_HOOKS_NEW_TIME(DIV_NEW_TIME, ( uint32_t ) ( xTickCount + 1 ) ); }
 	
 #elif (TRC_CFG_FREERTOS_VERSION >= TRC_FREERTOS_VERSION_7_5_X)
 
@@ -1360,7 +1360,7 @@ extern volatile uint32_t uiTraceSystemState;
 /* Called on vTaskDelay - note the use of FreeRTOS variable xTicksToDelay */
 #undef traceTASK_DELAY
 #define traceTASK_DELAY() \
-	trcKERNEL_HOOKS_TASK_DELAY(TASK_DELAY, pxCurrentTCB, xTicksToDelay); \
+	trcKERNEL_HOOKS_TASK_DELAY(TASK_DELAY, pxCurrentTCB, ( uint32_t ) xTicksToDelay); \
 	trcKERNEL_HOOKS_SET_TASK_INSTANCE_FINISHED();
 
 /* Called on vTaskDelayUntil - note the use of FreeRTOS variable xTimeToWake */
@@ -1368,12 +1368,12 @@ extern volatile uint32_t uiTraceSystemState;
 #if (TRC_CFG_FREERTOS_VERSION >= TRC_FREERTOS_VERSION_9_0_0)
 
 #define traceTASK_DELAY_UNTIL(xTimeToWake) \
-	trcKERNEL_HOOKS_TASK_DELAY(TASK_DELAY_UNTIL, pxCurrentTCB, xTimeToWake); \
+	trcKERNEL_HOOKS_TASK_DELAY(TASK_DELAY_UNTIL, pxCurrentTCB, ( uint32_t ) xTimeToWake); \
 	trcKERNEL_HOOKS_SET_TASK_INSTANCE_FINISHED();
 #else
 
 #define traceTASK_DELAY_UNTIL() \
-	trcKERNEL_HOOKS_TASK_DELAY(TASK_DELAY_UNTIL, pxCurrentTCB, xTimeToWake); \
+	trcKERNEL_HOOKS_TASK_DELAY(TASK_DELAY_UNTIL, pxCurrentTCB, ( uint32_t ) xTimeToWake); \
 	trcKERNEL_HOOKS_SET_TASK_INSTANCE_FINISHED();
 
 #endif
@@ -1605,7 +1605,7 @@ extern void vTraceStoreMemMangEvent(uint32_t ecode, uint32_t address, int32_t si
 		} \
 		else \
 		{ \
-			trcKERNEL_HOOKS_KERNEL_SERVICE_WITH_PARAM(EVENTGROUP_TIMER + (uint32_t)xCommandID + ((xReturn == pdPASS) ? 0 : (TIMER_CREATE_TRCFAILED - TIMER_CREATE)), TIMER, tmr, xOptionalValue); \
+			trcKERNEL_HOOKS_KERNEL_SERVICE_WITH_PARAM((uint32_t)EVENTGROUP_TIMER + (uint32_t)xCommandID + (uint32_t)((xReturn == pdPASS) ? 0 : (TIMER_CREATE_TRCFAILED - TIMER_CREATE)), TIMER, tmr, xOptionalValue); \
 		}\
 	}
 
@@ -1777,9 +1777,9 @@ extern void vTraceStoreMemMangEvent(uint32_t ecode, uint32_t address, int32_t si
 	if (TRACE_GET_OBJECT_FILTER(TASK, pxCurrentTCB) & CurrentFilterMask) \
 	{ \
 		if (pxCurrentTCB->ucNotifyState[index] == taskNOTIFICATION_RECEIVED) \
-			prvTraceStoreKernelCallWithParam(TRACE_TASK_NOTIFY_WAIT, TRACE_CLASS_TASK, TRACE_GET_TASK_NUMBER(pxCurrentTCB), xTicksToWait); \
+			prvTraceStoreKernelCallWithParam(TRACE_TASK_NOTIFY_WAIT, TRACE_CLASS_TASK, TRACE_GET_TASK_NUMBER(pxCurrentTCB), ( uint32_t ) xTicksToWait); \
 		else \
-			prvTraceStoreKernelCallWithParam(TRACE_TASK_NOTIFY_WAIT_TRCFAILED, TRACE_CLASS_TASK, TRACE_GET_TASK_NUMBER(pxCurrentTCB), xTicksToWait); \
+			prvTraceStoreKernelCallWithParam(TRACE_TASK_NOTIFY_WAIT_TRCFAILED, TRACE_CLASS_TASK, TRACE_GET_TASK_NUMBER(pxCurrentTCB), ( uint32_t ) xTicksToWait); \
 	}
 
 #endif
@@ -1796,7 +1796,7 @@ extern void vTraceStoreMemMangEvent(uint32_t ecode, uint32_t address, int32_t si
 
 #define traceTASK_NOTIFY_WAIT_BLOCK(index) \
 	if (TRACE_GET_OBJECT_FILTER(TASK, pxCurrentTCB) & CurrentFilterMask) \
-		prvTraceStoreKernelCallWithParam(TRACE_TASK_NOTIFY_WAIT_TRCBLOCK, TRACE_CLASS_TASK, TRACE_GET_TASK_NUMBER(pxCurrentTCB), xTicksToWait); \
+		prvTraceStoreKernelCallWithParam(TRACE_TASK_NOTIFY_WAIT_TRCBLOCK, TRACE_CLASS_TASK, TRACE_GET_TASK_NUMBER(pxCurrentTCB), ( uint32_t ) xTicksToWait); \
 	trcKERNEL_HOOKS_SET_TASK_INSTANCE_FINISHED();
 
 #endif
